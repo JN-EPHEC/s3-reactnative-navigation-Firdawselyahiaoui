@@ -1,34 +1,47 @@
-import "react-native-reanimated";
-
 import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import PostListScreen from "./screens/PostListScreen";
-import PostDetailScreen from "./screens/PostDetailScreen";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Text, View } from "react-native";
 
-export type RootStackParamList = {
-  PostList: undefined;
-  PostDetail: { postId: string; title: string; content: string };
-};
-
-export default function RootLayout() {
-  const Stack = createNativeStackNavigator<RootStackParamList>();
-
+function HomeScreen() {
   return (
-  
-      <Stack.Navigator initialRouteName="PostList">
-        <Stack.Screen
-          name="PostList"
-          component={PostListScreen}
-          options={{ title: "Blog Posts" }}
-        />
-        <Stack.Screen
-          name="PostDetail"
-          component={PostDetailScreen}
-          options={{ title: "Post Details" }}
-        />
-      </Stack.Navigator>
-  
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <Text>🏠 Welcome to the App!</Text>
+    </View>
   );
 }
 
+function ProfileScreen() {
+  return (
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <Text>👤 Name: John Doe</Text>
+      <Text>Username: @johndoe</Text>
+    </View>
+  );
+}
+
+function SettingsScreen() {
+  return (
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <Text>⚙️ App Settings</Text>
+    </View>
+  );
+}
+
+const Tab = createBottomTabNavigator();
+
+export default function Layout() {
+  return (
+    <Tab.Navigator
+      initialRouteName="Home"
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: "tomato",
+        tabBarInactiveTintColor: "gray",
+      }}
+    >
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="Settings" component={SettingsScreen} />
+    </Tab.Navigator>
+  );
+}
