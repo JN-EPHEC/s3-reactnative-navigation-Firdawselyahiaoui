@@ -88,7 +88,7 @@ function ShopStack() {
 }
 
 ////////////////////////////////////////////////////////
-// --- 3️⃣ Création du Bottom Tab principal ---
+// --- 3️⃣ Création du Bottom Tab principal --
 ////////////////////////////////////////////////////////
 
 const Tab = createBottomTabNavigator();
