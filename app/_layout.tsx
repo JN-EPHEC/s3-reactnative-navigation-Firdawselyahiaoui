@@ -1,110 +1,149 @@
 import React from "react";
-import { View, Text, TouchableOpacity, FlatList } from "react-native";
+import { Text, View, FlatList, Pressable, StyleSheet, Button } from "react-native";
+import { DrawerActions } from "@react-navigation/native";
+import { createDrawerNavigator } from "@react-navigation/drawer";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createStackNavigator } from "@react-navigation/stack";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-////////////////////////////////////////////////////////
-// --- 1️⃣ Écrans de l'app (écrits directement ici) ---
-////////////////////////////////////////////////////////
+/* ---------- Données des cours ---------- */
+const COURSES = [
+  {
+    id: "c1",
+    title: "Intro to React Native",
+    description: "Learn the basics of building native apps with React Native.",
+  },
+  {
+    id: "c2",
+    title: "Advanced JavaScript",
+    description: "Deep dive into closures, prototypes, and async programming.",
+  },
+  {
+    id: "c3",
+    title: "UI/UX for Developers",
+    description: "Design better and more user-friendly interfaces.",
+  },
+];
 
-// Liste des produits
-function ProductListScreen({ navigation }: any) {
-  const products = [
-    { id: 1, name: "Laptop" },
-    { id: 2, name: "Mouse" },
-    { id: 3, name: "Keyboard" },
-  ];
-
+/* ---------- Écran : liste des cours ---------- */
+function CourseListScreen({ navigation }: { navigation: any }) {
   return (
-    <View style={{ flex: 1, padding: 20 }}>
-      <Text style={{ fontSize: 22, fontWeight: "bold", marginBottom: 20 }}>
-        Product List
-      </Text>
+    <View style={styles.screen}>
+      <Text style={styles.heading}>All Courses</Text>
 
       <FlatList
-        data={products}
-        keyExtractor={(item) => item.id.toString()}
+        data={COURSES}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => navigation.navigate("ProductDetail", { product: item })}
-            style={{
-              backgroundColor: "#eee",
-              padding: 15,
-              borderRadius: 10,
-              marginBottom: 10,
-            }}
+          <Pressable
+            style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+            onPress={() =>
+              navigation.navigate("CourseDetail", {
+                courseId: item.id,
+                title: item.title,
+                description: item.description,
+              })
+            }
           >
-            <Text style={{ fontSize: 18 }}>{item.name}</Text>
-          </TouchableOpacity>
+            <Text style={styles.cardTitle}>{item.title}</Text>
+            <Text style={styles.cardDesc}>{item.description}</Text>
+          </Pressable>
         )}
       />
     </View>
   );
 }
 
-// Détail du produit
-function ProductDetailScreen({ route }: any) {
-  const { product } = route.params;
+/* ---------- Écran : détails d’un cours ---------- */
+function CourseDetailScreen({ route }: { route: any }) {
+  const { title, description, courseId } = route.params;
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text style={{ fontSize: 24, fontWeight: "bold" }}>{product.name}</Text>
-      <Text style={{ fontSize: 16, marginTop: 10 }}>
-        Details about {product.name}...
-      </Text>
+    <View style={styles.screen}>
+      <Text style={styles.heading}>{title}</Text>
+      <Text style={styles.body}>{description}</Text>
+      <Text style={{ color: "gray", marginTop: 10 }}>Course ID: {courseId}</Text>
     </View>
   );
 }
 
-// Écran du panier
-function CartScreen() {
+/* ---------- Écran : Wishlist ---------- */
+function WishlistScreen() {
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Your Shopping Cart is empty.</Text>
+    <View style={styles.screen}>
+      <Text style={styles.heading}>My Wishlist</Text>
+      <Text style={styles.body}>Your wishlist is empty.</Text>
     </View>
   );
 }
 
-////////////////////////////////////////////////////////
-// --- 2️⃣ Création du Stack pour l'onglet "Shop" ---
-////////////////////////////////////////////////////////
-
-const Stack = createStackNavigator();
-
-function ShopStack() {
+/* ---------- Écran : Profil ---------- */
+function ProfileScreen() {
   return (
-    <Stack.Navigator>
+    <View style={styles.screen}>
+      <Text style={styles.heading}>My Profile</Text>
+      <Text style={styles.body}>Name: Jane Student</Text>
+      <Text style={styles.body}>Email: jane.student@example.com</Text>
+    </View>
+  );
+}
+
+/* ---------- Stack Navigator (All Courses) ---------- */
+const Stack = createNativeStackNavigator();
+
+function CoursesStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={({ navigation }) => ({
+        headerShown: true,
+        headerLeft: () => (
+          <Button
+            title="☰"
+            onPress={() => navigation.getParent()?.dispatch(DrawerActions.openDrawer())}
+          />
+        ),
+      })}
+    >
+      <Stack.Screen name="CourseList" component={CourseListScreen} options={{ title: "Courses" }} />
       <Stack.Screen
-        name="ProductList"
-        component={ProductListScreen}
-        options={{ title: "Shop" }}
-      />
-      <Stack.Screen
-        name="ProductDetail"
-        component={ProductDetailScreen}
-        options={{ title: "Product Details" }}
+        name="CourseDetail"
+        component={CourseDetailScreen}
+        options={({ route }: any) => ({ title: route.params?.title || "Course Detail" })}
       />
     </Stack.Navigator>
   );
 }
 
-////////////////////////////////////////////////////////
-// --- 3️⃣ Création du Bottom Tab principal --
-////////////////////////////////////////////////////////
-
+/* ---------- Tab Navigator (dans Courses) ---------- */
 const Tab = createBottomTabNavigator();
 
-export default function Layout() {
+function CoursesTabs() {
   return (
-    <Tab.Navigator
-      initialRouteName="Shop"
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: "tomato",
-        tabBarInactiveTintColor: "gray",
-      }}
-    >
-      <Tab.Screen name="Shop" component={ShopStack} />
-      <Tab.Screen name="My Cart" component={CartScreen} />
+    <Tab.Navigator screenOptions={{ headerShown: false }}>
+      <Tab.Screen name="AllCourses" component={CoursesStack} options={{ title: "All Courses" }} />
+      <Tab.Screen name="Wishlist" component={WishlistScreen} options={{ title: "My Wishlist" }} />
     </Tab.Navigator>
   );
 }
+
+/* ---------- Drawer principal ---------- */
+const Drawer = createDrawerNavigator();
+
+export default function Layout() {
+  return (
+    <Drawer.Navigator initialRouteName="Courses">
+      <Drawer.Screen name="Courses" component={CoursesTabs} />
+      <Drawer.Screen name="MyProfile" component={ProfileScreen} options={{ title: "My Profile" }} />
+    </Drawer.Navigator>
+  );
+}
+
+/* ---------- Styles ---------- */
+const styles = StyleSheet.create({
+  screen: { flex: 1, padding: 16, backgroundColor: "#fff" },
+  heading: { fontSize: 22, fontWeight: "700", marginBottom: 12 },
+  body: { fontSize: 16, color: "#222" },
+  card: { backgroundColor: "#f0f0f0", padding: 12, borderRadius: 8, marginBottom: 10 },
+  pressed: { opacity: 0.7 },
+  cardTitle: { fontSize: 18, fontWeight: "600" },
+  cardDesc: { fontSize: 14, color: "#555", marginTop: 4 },
+});
+

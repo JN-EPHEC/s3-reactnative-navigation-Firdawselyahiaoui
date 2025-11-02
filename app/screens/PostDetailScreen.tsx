@@ -1,11 +1,16 @@
 import React from "react";
 import { StyleSheet, ScrollView, Text } from "react-native";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../_layout";
 
-type Props = NativeStackScreenProps<RootStackParamList, "PostDetail">;
+type PostDetailProps = {
+  route: {
+    params: {
+      title: string;
+      content: string;
+    };
+  };
+};
 
-export default function PostDetailScreen({ route }: Props) {
+export default function PostDetailScreen({ route }: PostDetailProps) {
   const { title, content } = route.params;
 
   return (

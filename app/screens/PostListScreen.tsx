@@ -1,9 +1,5 @@
 import React from "react";
 import { StyleSheet, Pressable, FlatList, Text, View } from "react-native";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../_layout";
-
-type Props = NativeStackScreenProps<RootStackParamList, "PostList">;
 
 const POSTS = [
   {
@@ -32,26 +28,25 @@ const POSTS = [
   },
 ];
 
-export default function PostListScreen({ navigation }: Props) {
-  function renderItem({ item }: { item: (typeof POSTS)[number] }) {
-    return (
-      <Pressable
-        style={({ pressed }) => [
-          styles.item,
-          pressed && styles.itemPressed,
-        ]}
-        onPress={() =>
-          navigation.navigate("PostDetail", {
-            postId: item.id,
-            title: item.title,
-            content: item.content,
-          })
-        }
-      >
-        <Text style={{ fontSize: 16, fontWeight: "bold" }}>{item.title}</Text>
-      </Pressable>
-    );
-  }
+type PostListProps = {
+  navigation: any;
+};
+
+export default function PostListScreen({ navigation }: PostListProps) {
+  const renderItem = ({ item }: { item: (typeof POSTS)[number] }) => (
+    <Pressable
+      style={({ pressed }) => [styles.item, pressed && styles.itemPressed]}
+      onPress={() =>
+        navigation.navigate("PostDetail", {
+          postId: item.id,
+          title: item.title,
+          content: item.content,
+        })
+      }
+    >
+      <Text style={{ fontSize: 16, fontWeight: "bold" }}>{item.title}</Text>
+    </Pressable>
+  );
 
   return (
     <View style={styles.container}>
@@ -64,7 +59,6 @@ export default function PostListScreen({ navigation }: Props) {
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
